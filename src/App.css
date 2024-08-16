@@ -1,0 +1,21 @@
+/* src/Pages/Form.css */
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.metadata-container {
+  margin-top: 1rem;
+}
+
+.metadata-card {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.metadata-card img {
+  max-width: 100%;
+  height: auto;
+}
