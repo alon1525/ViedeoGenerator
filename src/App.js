@@ -1,26 +1,21 @@
 // src/App.jsx
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Root from './Pages/Root.jsx';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Form from './Pages/Form.jsx';
 import Information from './Pages/Information.jsx';
 import ErrorPage from './Pages/ErrorPage.jsx';
 import './App.css'; // Import your CSS for overall styling
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Root />, // Root component with <Outlet />
-    errorElement: <ErrorPage />, // Error page for handling errors
-    children: [
-      { index: true, element: <Form /> },
-      { path: "information", element: <Information /> },
-    ],
-  },
-]);
-
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Form />} />
+        <Route path="information" element={<Information />} />
+        <Route path="*" element={<ErrorPage />} /> {/* Catch-all route for 404 errors */}
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
