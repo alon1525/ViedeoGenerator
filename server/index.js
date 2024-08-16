@@ -24,7 +24,6 @@ app.use(limiter);
 
 // Fetch Metadata Endpoint
 app.post('/fetch-metadata', async (req, res) => {
-  console.log('working');
   try {
     const { urls } = req.body;
     const metadataArray = [];
@@ -57,5 +56,5 @@ app.post('/fetch-metadata', async (req, res) => {
 
 
 // Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5021;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
