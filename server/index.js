@@ -28,6 +28,11 @@ app.get('/', (req, res) => {
   res.send("server is running and cors is working")
 })
 
+app.get('/fetch_metadata', (req, res) => {
+  res.send("server is running and cors is working")
+})
+
+
 // Fetch Metadata Endpoint
 app.post('/fetch-metadata', async (req, res) => {
   try {
