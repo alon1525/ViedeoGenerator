@@ -37,7 +37,13 @@ app.post('/fetch-metadata', async (req, res) => {
           const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || 'N/A';
           const image = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || 'N/A';
 
-          metadataArray.push({ title, description, image });
+          if (image === "N/A" && description === "N/A" && title === "N/A"){
+            metadataArray = [{ url, title: 'Error', description: 'Error fetching metadata', image: 'Error' }];
+            break;
+          }
+          else{
+            metadataArray.push({ title, description, image });
+          }
         } catch (error) {
           console.error(`Error fetching URL: ${url}`, error);
           metadataArray.push({ url, title: 'Error', description: 'Error fetching metadata', image: 'Error' });
