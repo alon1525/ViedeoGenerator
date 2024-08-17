@@ -23,8 +23,14 @@ function URLSubmit() {
         { urls }
       );
       const resultsContainer = document.querySelector(".results-container");
-      if(response.data[0].image === "Error"){
-        setError("Invalid Url. Please try again.");   
+      const hasError = response.data.some(item =>
+        item.title === 'Error' || 
+        item.description === 'Error fetching metadata' || 
+        item.image === 'Error'
+      );
+
+      if (hasError) {
+        setError('An error occurred while fetching data.');
       }
       else{
         setResults(response.data);

@@ -1,6 +1,6 @@
 // src/__tests__/server.test.js
 import request from 'supertest';
-import app from '../server/index.js'; // Adjust the path if necessary
+import app from '../index.js'; // Adjust the path if necessary
 import axios from 'axios';
 
 jest.mock('axios');
