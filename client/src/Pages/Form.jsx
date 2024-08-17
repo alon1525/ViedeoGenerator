@@ -19,7 +19,7 @@ function URLSubmit() {
     setLoading(true); // Start loading
     try {
       const response = await axios.post(
-        "http://localhost:5021/fetch-metadata",
+        "https://junior-developer-home-task-exam-backend.vercel.app/fetch-metadata",
         { urls }
       );
       const resultsContainer = document.querySelector(".results-container");
