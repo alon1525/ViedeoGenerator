@@ -20,6 +20,10 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+app.get('/', (req, res) => {
+  res.send("server is running")
+})
+
 // Fetch Metadata Endpoint
 app.post('/fetch-metadata', async (req, res) => {
   try {
