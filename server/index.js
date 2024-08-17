@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(cors({
-  origin: 'https://junior-developer-home-task-exam-client.vercel.app',
+  origin: '*',
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
 }));
@@ -25,7 +25,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get('/', (req, res) => {
-  res.send("server is running")
+  res.send("server is running and cors is working")
 })
 
 // Fetch Metadata Endpoint
