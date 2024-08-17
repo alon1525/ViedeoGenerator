@@ -10,6 +10,10 @@
       {
         "src": "/(.*)",
         "dest": "/index.js"
+      },
+      {
+        "src":"/fetch_metadata",
+        "dest": "/index.js"
       }
     ]
   }

@@ -24,9 +24,6 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-app.get('/', (req, res) => {
-  res.send("server is running and cors is working")
-})
 
 app.get('/fetch_metadata', (req, res) => {
   res.send("server is running and cors is working")
