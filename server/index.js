@@ -1,18 +1,16 @@
 import express from 'express';
 import axios from 'axios';
-import * as cheerio from 'cheerio';
+import { JSDOM } from 'jsdom';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import cors from 'cors';
-import bodyParser from "body-parser";
-
+import bodyParser from 'body-parser';
 
 const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -29,20 +27,19 @@ app.post('/fetch-metadata', async (req, res) => {
     const metadataArray = [];
 
     for (let url of urls) {
-      if (url != ""){
+      if (url != "") {
         try {
           const response = await axios.get(url);
           const html = response.data;
-          const $ = cheerio.load(html);
-  
-          const title = $('head title').text();
-          const description = $('meta[name="description"]').attr('content');
-          const image = $('meta[property="og:image"]').attr('content');
-  
+          const { document } = (new JSDOM(html)).window;
+          
+          const title = document.querySelector('head title')?.textContent || 'N/A';
+          const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || 'N/A';
+          const image = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || 'N/A';
+
           metadataArray.push({ title, description, image });
         } catch (error) {
           console.error(`Error fetching URL: ${url}`, error);
-          //metadataArray.push({ title: 'N/A', description: 'N/A', image: 'N/A' });
           metadataArray.push({ url, title: 'Error', description: 'Error fetching metadata', image: 'Error' });
         }
       }
@@ -55,7 +52,8 @@ app.post('/fetch-metadata', async (req, res) => {
   }
 });
 
-
 // Start the server
 const PORT = process.env.PORT || 5021;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+export default app
