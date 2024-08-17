@@ -42,7 +42,8 @@ app.post('/fetch-metadata', async (req, res) => {
           metadataArray.push({ title, description, image });
         } catch (error) {
           console.error(`Error fetching URL: ${url}`, error);
-          metadataArray.push({ title: 'N/A', description: 'N/A', image: 'N/A' });
+          //metadataArray.push({ title: 'N/A', description: 'N/A', image: 'N/A' });
+          metadataArray.push({ url, title: 'Error', description: 'Error fetching metadata', image: 'Error' });
         }
       }
     }

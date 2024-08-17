@@ -2,7 +2,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Form from './Pages/Form.jsx';
-import Information from './Pages/Information.jsx';
 import ErrorPage from './Pages/ErrorPage.jsx';
 import './App.css'; // Import your CSS for overall styling
 
@@ -11,7 +10,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Form />} />
-        <Route path="information" element={<Information />} />
         <Route path="*" element={<ErrorPage />} /> {/* Catch-all route for 404 errors */}
       </Routes>
     </Router>

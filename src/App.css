@@ -135,44 +135,6 @@ body{
 .two label a:hover{
     text-decoration: underline;
 }
-@media only screen and (max-width: 786px){
-    .nav-button{
-        display: none;
-    }
-    .nav-menu.responsive{
-        top: 100px;
-    }
-    .nav-menu{
-        position: absolute;
-        top: -800px;
-        display: flex;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.2);
-        width: 100%;
-        height: 90vh;
-        backdrop-filter: blur(20px);
-        transition: .3s;
-    }
-    .nav-menu ul{
-        flex-direction: column;
-        text-align: center;
-    }
-    .nav-menu-btn{
-        display: block;
-    }
-    .nav-menu-btn i{
-        font-size: 25px;
-        color: #fff;
-        padding: 10px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        cursor: pointer;
-        transition: .3s;
-    }
-    .nav-menu-btn i:hover{
-        background: rgba(255, 255, 255, 0.15);
-    }
-}
 @media only screen and (max-width: 540px) {
     .wrapper{
         min-height: 100vh;
@@ -197,20 +159,219 @@ body{
   color: #333;
 }
 
-/* Additional adjustments for .form-box to ensure proper alignment */
-.form-box {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center; 
-  justify-content: center;
-  width: 512px;
-  height: auto;
-  padding: 20px; 
+.headline {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .url-input-container {
   display: flex;
-  flex-direction: column; /* Stack inputs vertically */
-  gap: 10px; /* Adjust gap size as needed */
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-box {
+  margin-bottom: 10px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.submit {
+  background-color: #405D72;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.submit:hover {
+  background-color: #758694;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.results-container {
+  background-color: rgba(240, 240, 240, 0.8); /* Semi-transparent background */
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  0% {
+      opacity: 0;
+      transform: translateY(20px); /* Slide up from 20px below */
+  }
+  100% {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+.results-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px; /* Space between the cards */
+  margin-bottom: 20px; /* Space below the cards and above the button */
+}
+
+.result-card {
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  text-align: center;
+  max-width: 27%;
+  height: 350px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Hover effect for result-card */
+.result-card:hover {
+  transform: translateY(-10px); /* Slight lift effect */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.result-card h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  height: 50px; /* Set a fixed height for the heading */
+  overflow: hidden; /* Hide overflow text if it exceeds the height */
+}
+
+.result-card p {
+  margin-bottom: 40px;
+  color: #555;
+}
+
+.result-card img {
+  max-width: 50%;
+  max-height: 100px;
+  border-radius: 5px;
+  align-self: center; /* Center the image horizontally */
+  margin: 0 auto;
+}
+
+@media only screen and (max-width: 768px) {
+  .result-card h3 {
+    font-size: 16px; /* Smaller font size for headings */
+  }
+
+  .result-card p {
+    font-size: 12px; /* Smaller font size for paragraph text */
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .result-card h3 {
+    font-size: 12px; /* Even smaller font size for headings */
+  }
+
+  .result-card p {
+    font-size: 9px; /* Even smaller font size for paragraph text */
+  }
+}
+
+
+button {
+  background-color: #405D72;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #758694;
+}
+
+/* New CSS for button placement */
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* Space between cards and button */
+}
+
+button {
+  background-color: #405D72;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #758694;
+}
+
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px); /* Slide down by 20px */
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px); /* Slide up from 20px below */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s forwards; /* Adjust timing as needed */
+}
+
+.fade-in {
+  animation: fadeIn 0.5s forwards; /* Adjust timing as needed */
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s forwards;
+}
+
+.loader {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
 }
