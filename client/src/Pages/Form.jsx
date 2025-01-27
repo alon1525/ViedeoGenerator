@@ -3,55 +3,51 @@ import axios from "axios";
 import "../App.css";
 
 function URLSubmit() {
-  const [urls, setUrls] = useState(["", "", ""]);
-  const [results, setResults] = useState([]);
+  const [formData, setFormData] = useState({
+    numPictures: 1,
+    videoDuration: 10,
+    title: "",
+    description: "",
+  });
   const [error, setError] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false); // State for loading
+  const [loading, setLoading] = useState(false);
+  const [videoLink, setVideoLink] = useState("");
 
-  function handleInputChange(index, event) {
-    const newUrls = [...urls];
-    newUrls[index] = event.target.value;
-    setUrls(newUrls);
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   }
 
   async function handleSubmit() {
-    setLoading(true); // Start loading
+    setLoading(true);
+    setError("");
+    setVideoLink("");
+
     try {
+      console.log("dsdsad");
       const response = await axios.post(
-        "https://junior-developer-home-task-exam-backend.vercel.app/fetch-metadata",
-        { urls }
-      );
-      const resultsContainer = document.querySelector(".results-container");
-      const hasError = response.data.some(item =>
-        item.title === 'Error' || 
-        item.description === 'Error fetching metadata' || 
-        item.image === 'Error'
+        "http://localhost:3000/generate-video",
+        {
+          numPictures: parseInt(formData.numPictures, 10),
+          videoDuration: parseInt(formData.videoDuration, 10),
+          title: formData.title,
+          description: formData.description,
+        },
+        { responseType: "blob" }
       );
 
-      if (hasError) {
-        setError('An error occurred while fetching data.');
-      }
-      else{
-        setResults(response.data);
-        setError("");
-        setSubmitted(true);
-        resultsContainer.classList.remove("fade-out");
+      if (response.status === 200) {
+        const videoBlob = response.data;
+        const videoURL = URL.createObjectURL(videoBlob);
+        setVideoLink(videoURL);
+      } else {
+        setError("Failed to generate the video. Please try again.");
       }
     } catch (err) {
-      setError("Failed to fetch metadata. Please try again.");
+      setError("An error occurred while generating the video.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
-  }
-
-  function handleGoBack() {
-    const resultsContainer = document.querySelector(".results-container");
-    resultsContainer.classList.add("fade-out");
-    setTimeout(() => {
-      setSubmitted(false);
-      setError(""); // Clear the error state when going back
-    }, 500);
   }
 
   return (
@@ -62,53 +58,81 @@ function URLSubmit() {
         </div>
       </nav>
 
-      {!submitted ? (
-        <div className="form-box">
-          <h1 className="headline">Submit Your URLs</h1>
-          <div className="url-input-container">
-            {urls.map((url, index) => (
-              <div className="input-box" key={index}>
-                <input
-                  type="text"
-                  className="input-field"
-                  value={url}
-                  onChange={(e) => handleInputChange(index, e)}
-                  placeholder={`Enter URL ${index + 1}`}
-                />
-              </div>
-            ))}
-            <div className="input-box">
-              <input
-                type="button"
-                className="submit"
-                value="Submit"
-                onClick={handleSubmit}
-                disabled={loading} // Disable button during loading
-              />
-            </div>
+      <div className="form-box">
+        <h1 className="headline">Generate Your Video</h1>
+        <div className="form-container">
+          <div className="input-box">
+            <label htmlFor="numPictures">Number of Pictures:</label>
+            <input
+              type="number"
+              id="numPictures"
+              name="numPictures"
+              value={formData.numPictures}
+              onChange={handleInputChange}
+              min="1"
+              className="input-field"
+            />
           </div>
 
-          {loading && <div className="loader">Loading...</div>} {/* Loader */}
-          {error && <p className="error-message">{error}</p>}
-        </div>
-      ) : (
-        <div className={`results-container ${submitted ? 'fade-in' : ''}`}>
-          <div className="results-cards">
-            {results.length > 0 ? (
-              results.map((result, index) => (
-                <div className="result-card" key={index}>
-                  <h3>{result.title}</h3>
-                  <p>{result.description}</p>
-                  {result.image && <img src={result.image} alt="Metadata" />}
-                </div>
-              ))
-            ) : (
-              <p>No results found.</p>
-            )}
+          <div className="input-box">
+            <label htmlFor="videoDuration">Video Duration (seconds):</label>
+            <input
+              type="number"
+              id="videoDuration"
+              name="videoDuration"
+              value={formData.videoDuration}
+              onChange={handleInputChange}
+              min="1"
+              className="input-field"
+            />
           </div>
-          <button onClick={handleGoBack}>Go Back</button>
+
+          <div className="input-box">
+            <label htmlFor="title">Video Title:</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              className="input-field"
+            />
+          </div>
+
+          <div className="input-box">
+            <label htmlFor="description">Video Description:</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              className="input-field"
+            />
+          </div>
+
+          <div className="input-box">
+            <input
+              type="button"
+              className="submit"
+              value="Generate Video"
+              onClick={handleSubmit}
+              disabled={loading}
+            />
+          </div>
         </div>
-      )}
+
+        {loading && <div className="loader">Generating video...</div>}
+        {error && <p className="error-message">{error}</p>}
+
+        {videoLink && (
+          <div className="video-download">
+            <p>Video generated successfully!</p>
+            <a href={videoLink} download="video.mp4" className="download-link">
+              Download Video
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

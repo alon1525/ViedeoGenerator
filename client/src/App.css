@@ -375,3 +375,9 @@ button:hover {
   color: #555;
   text-align: center;
 }
+label {
+  color: white;
+  font-size: 16px; /* Optional: Adjust font size if needed */
+  margin-bottom: 4px; /* Optional: Add spacing below the label */
+  display: block; /* Ensures label appears above the input */
+}

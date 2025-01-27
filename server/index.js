@@ -1,75 +1,106 @@
-import express from 'express';
-import axios from 'axios';
-import { JSDOM } from 'jsdom';
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
-import cors from 'cors';
-import bodyParser from 'body-parser';
+import OpenAI from "openai";
+import express from "express";
+import { exec } from "child_process";
+import fs from "fs";
+import axios from "axios";
+import dotenv from "dotenv";
+import cors from "cors"; // Import the CORS package
+
+// Load environment variables from .env
+dotenv.config();
 
 const app = express();
-app.use(express.json());
-app.use(helmet());
-app.use(cors({
-  origin: 'https://junior-developer-home-task-exam-client.vercel.app',
-  methods: 'GET,POST,PUT,DELETE',
-  allowedHeaders: 'Content-Type,Authorization',
-}));
-app.use(bodyParser.urlencoded({ extended: true }));
 
-// Rate Limiting
-const limiter = rateLimit({
-  windowMs: 1000, // 1 second
-  max: 5, // Limit each IP to 5 requests per windowMs
+// Enable CORS for all origins
+app.use(cors()); // This allows requests from any origin, including http://localhost:3001
+
+app.use(express.json());
+
+const openai = new OpenAI({
+  apiKey: process.env.API_KEY, // Use API_KEY from .env
 });
 
-app.use(limiter);
+async function generateImages(imagePrompts) {
+  const images = [];
 
+  for (const prompt of imagePrompts) {
+    try {
+      const response = await axios.post('https://backend.craiyon.com/generate', {
+        prompt: prompt,
+      });
 
-app.get('/fetch_metadata', (req, res) => {
-  res.send("server is running and cors is working")
-})
+      // Craiyon returns a list of image URLs in its response
+      const imageUrls = response.data.images.map((img) => `data:image/png;base64,${img}`);
+      images.push(...imageUrls); // Collect all images as Base64 strings
+    } catch (error) {
+      console.error(`Error generating image for prompt "${prompt}":`, error);
+    }
+  }
 
+  return images;
+}
 
-// Fetch Metadata Endpoint
-app.post('/fetch-metadata', async (req, res) => {
+app.post("/generate-video", async (req, res) => {
   try {
-    const { urls } = req.body;
-    const metadataArray = [];
+    const { numPictures, videoDuration, title, description } = req.body;
 
-    for (let url of urls) {
-      if (url != "") {
-        try {
-          const response = await axios.get(url);
-          const html = response.data;
-          const { document } = (new JSDOM(html)).window;
-          
-          const title = document.querySelector('head title')?.textContent || 'N/A';
-          const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || 'N/A';
-          const image = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || 'N/A';
-
-          if (image === "N/A" && description === "N/A" && title === "N/A"){
-            metadataArray = [{ url, title: 'Error', description: 'Error fetching metadata', image: 'Error' }];
-            break;
-          }
-          else{
-            metadataArray.push({ title, description, image });
-          }
-        } catch (error) {
-          console.error(`Error fetching URL: ${url}`, error);
-          metadataArray.push({ url, title: 'Error', description: 'Error fetching metadata', image: 'Error' });
-        }
-      }
+    // Step 1: Generate image descriptions
+    const imagePrompts = [];
+    for (let i = 0; i < numPictures; i++) {
+      const prompt = `${description} with a unique art style, style variation ${i + 1}`;
+      imagePrompts.push(prompt);
     }
 
-    res.json(metadataArray);
-  } catch (err) {
-    console.error('Error processing request:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Step 2: Use OpenAI's API to generate images
+    const images = [];
+    for (const prompt of imagePrompts) {
+      const response = await openai.images.generate({
+        prompt,
+        n: 1,
+        size: "512x512",
+      });
+      images.push(response.data[0].url); // Collect generated image URLs
+    }
+    console.log(images);
+    // Step 3: Download images and create a video
+    const imagePaths = [];
+    for (let i = 0; i < images.length; i++) {
+      const imagePath = `./image_${i}.png`;
+      const imageResponse = await axios.get(images[i], { responseType: "stream" });
+      const writer = fs.createWriteStream(imagePath);
+      imageResponse.data.pipe(writer);
+      imagePaths.push(imagePath);
+
+      await new Promise((resolve) => writer.on("finish", resolve));
+    }
+
+    // Use FFmpeg to create a video
+    const outputVideoPath = "./output_video.mp4";
+    const duration = videoDuration / numPictures;
+
+    const ffmpegCommand = `ffmpeg ${imagePaths
+      .map((path) => `-loop 1 -t ${duration} -i ${path}`)
+      .join(" ")} -filter_complex "concat=n=${numPictures}:v=1:a=0" ${outputVideoPath}`;
+
+    exec(ffmpegCommand, (err) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to generate video" });
+      }
+
+      res.download(outputVideoPath, "video.mp4", (err) => {
+        if (err) {
+          console.error("Error serving video:", err);
+        }
+
+        // Cleanup temporary files
+        imagePaths.forEach((path) => fs.unlinkSync(path));
+        fs.unlinkSync(outputVideoPath);
+      });
+    });
+  } catch (error) {
+    console.error("Error generating video:", error);
+    res.status(500).json({ error: "An error occurred" });
   }
 });
 
-// Start the server
-const PORT = process.env.PORT || 5021;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-export default app
+app.listen(3000, () => console.log("Server running on port 3000"));
